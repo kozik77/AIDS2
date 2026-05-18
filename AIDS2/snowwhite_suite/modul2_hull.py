@@ -1,6 +1,6 @@
 import math
 from typing import List
-from snowwhite_suite.modele import Punkt
+from AIDS2.snowwhite_suite.modele import Punkt
 
 class OtoczkaWypukla:
     @staticmethod

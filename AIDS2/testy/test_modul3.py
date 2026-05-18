@@ -1,5 +1,5 @@
 import pytest
-from snowwhite_suite.modul3_rmq import DrzewoPrzedzialowe
+from AIDS2.snowwhite_suite.modul3_rmq import DrzewoPrzedzialowe
 
 def test_puste_drzewo() -> None:
     drzewo = DrzewoPrzedzialowe([])

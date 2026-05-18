@@ -1,5 +1,5 @@
 import pytest
-from snowwhite_suite.modul4_huffman import KoderHuffmana
+from AIDS2.snowwhite_suite.modul4_huffman import KoderHuffmana
 
 def test_pusty_tekst() -> None:
     koder = KoderHuffmana()

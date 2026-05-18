@@ -1,6 +1,6 @@
 import pytest
-from snowwhite_suite.modul2_hull import OtoczkaWypukla
-from snowwhite_suite.modele import Punkt
+from AIDS2.snowwhite_suite.modul2_hull import OtoczkaWypukla
+from AIDS2.snowwhite_suite.modele import Punkt
 
 def test_minimalna_liczba_punktow() -> None:
     algo = OtoczkaWypukla()
