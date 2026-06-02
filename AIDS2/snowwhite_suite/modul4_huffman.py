@@ -1,3 +1,8 @@
+# M4 cz.1: kroniki zajmują dużo miejsca -> kompresja Huffmana
+# częste znaki = krótkie kody, rzadkie = długie
+# budowa drzewa: heap, łączymy dwa najrzadsze -> nowy węzeł
+# złożoność budowy: O(n log n), kompresja O(m), dekompresja O(m)
+
 import heapq
 from dataclasses import dataclass
 from typing import Dict, Optional
@@ -21,7 +26,7 @@ class KoderHuffmana:
 
         czestosci = Counter(tekst)
         
-        # Przypadek brzegowy z dokumentacji: jeden unikalny znak
+        # tylko jeden znak - nie da się zbudować normalnego drzewa, dajemy kod "0"
         if len(czestosci) == 1:
             znak = list(czestosci.keys())[0]
             self.korzen = WezelHuffmana(znak=znak, czestosc=czestosci[znak])
@@ -29,14 +34,14 @@ class KoderHuffmana:
             return
 
         kopiec = []
-        # Tie-breaker rozwiązujący problem TypeError przy równych częstościach
-        licznik = 0  
+        licznik = 0  # żeby heapq nie porównywał WezelHuffmana (TypeError)
 
         for znak, czestosc in czestosci.items():
             w = WezelHuffmana(znak=znak, czestosc=czestosc)
             heapq.heappush(kopiec, (czestosc, licznik, w))
             licznik += 1
 
+        # łączymy dwa najrzadsze węzły aż zostanie jeden (korzeń)
         while len(kopiec) > 1:
             czest1, _, lewy = heapq.heappop(kopiec)
             czest2, _, prawy = heapq.heappop(kopiec)
@@ -55,6 +60,7 @@ class KoderHuffmana:
         self._generuj_kody_rekurencja(self.korzen, "")
 
     def _generuj_kody_rekurencja(self, wezel: Optional[WezelHuffmana], aktualny_kod: str) -> None:
+        # lewy=0, prawy=1, na liściu zapisujemy kod znaku
         if wezel is None:
             return
         
@@ -66,28 +72,28 @@ class KoderHuffmana:
         self._generuj_kody_rekurencja(wezel.prawy, aktualny_kod + "1")
 
     def kompresuj(self, tekst: str) -> str:
+        # rebuild drzewa za każdym razem (inny tekst = inne kody)
         if not tekst:
             return ""
-        if not self.kody:
-            self.buduj_drzewo(tekst)
+        self.kody = {}
+        self.korzen = None
+        self.buduj_drzewo(tekst)
         return "".join(self.kody[znak] for znak in tekst)
 
     def dekompresuj(self, skompresowany_tekst: str) -> str:
         if not skompresowany_tekst or self.korzen is None:
             return ""
             
-        # Obsługa przypadku z jednym unikalnym znakiem
+        # jeden znak - każdy bit to ten znak
         if self.korzen.lewy is None and self.korzen.prawy is None:
             return self.korzen.znak * len(skompresowany_tekst)
 
+        # schodzimy po drzewie: 0=lewy, 1=prawy, jak liść to znak
         odkodowany = []
         aktualny = self.korzen
         
         for bit in skompresowany_tekst:
-            if bit == "0":
-                aktualny = aktualny.lewy
-            else:
-                aktualny = aktualny.prawy
+            aktualny = aktualny.lewy if bit == "0" else aktualny.prawy
                 
             if aktualny.znak is not None:
                 odkodowany.append(aktualny.znak)

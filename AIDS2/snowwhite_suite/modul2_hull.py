@@ -1,14 +1,15 @@
+# M2: książę okrąża kopalnie - szukamy najkrótszej trasy = obwód otoczki wypukłej
+# algorytm Andrew: sortujemy, budujemy dolną i górną pół-otoczkę, łączymy
+# złożoność O(n log n) - domina to sortowanie
+
 import math
 from typing import List
-from AIDS2.snowwhite_suite.modele import Punkt
+from snowwhite_suite.modele import Punkt
 
 class OtoczkaWypukla:
     @staticmethod
     def iloczyn_wektorowy(o: Punkt, a: Punkt, b: Punkt) -> float:
-        """
-        Oblicza znak iloczynu wektorowego wektorów OA i OB.
-        Dodatni: lewy skręt, Ujemny: prawy skręt, 0: współliniowe.
-        """
+        # >0 lewy skręt, <0 prawy, =0 na linii
         return (a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
 
     def buduj(self, punkty: List[Punkt]) -> List[Punkt]:
@@ -16,24 +17,23 @@ class OtoczkaWypukla:
         if n <= 2:
             return sorted(punkty, key=lambda p: (p.x, p.y))
 
-        # Sortowanie leksykograficzne (według X, potem Y)
         posortowane = sorted(punkty, key=lambda p: (p.x, p.y))
 
-        # Budowa dolnej półotoczki
+        # dolna pół-otoczka - idziemy L→R, usuwamy prawe skręty
         dolna = []
         for p in posortowane:
             while len(dolna) >= 2 and self.iloczyn_wektorowy(dolna[-2], dolna[-1], p) <= 0:
                 dolna.pop()
             dolna.append(p)
 
-        # Budowa górnej półotoczki
+        # górna pół-otoczka - idziemy P→L, analogicznie
         gorna = []
         for p in reversed(posortowane):
             while len(gorna) >= 2 and self.iloczyn_wektorowy(gorna[-2], gorna[-1], p) <= 0:
                 gorna.pop()
             gorna.append(p)
 
-        # Łączymy, usuwając ostatni punkt każdej listy (powtarza się)
+        # ostatni punkt każdej się powtarza więc go ucinamy
         return dolna[:-1] + gorna[:-1]
 
     @staticmethod
